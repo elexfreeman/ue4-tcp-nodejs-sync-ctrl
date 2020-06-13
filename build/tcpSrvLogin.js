@@ -23,10 +23,9 @@ const net = __importStar(require("net"));
 const moment = require('moment');
 const HashFunc_1 = require("./Lib/HashFunc");
 const db_1 = require("./Module/Sys/db");
-const AAClasses = __importStar(require("@a-a-game-studio/aa-classes/lib"));
-const UserCtrl_1 = require("./Module/User/UserCtrl");
 const ResponseSys_1 = require("./Module/Sys/ResponseSys");
-const UserR_1 = require("./Module/User/UserR");
+const PlayerSyncCtrl_1 = require("./Module/PlayerSync/PlayerSyncCtrl");
+const Route_1 = require("./Module/Route/Route");
 /**
  * The current date
  */
@@ -41,40 +40,23 @@ const server = net.createServer((socket) => {
     db_1.aSocketClient[clientToken] = {
         user: null,
         socket: socket,
+        loc: null,
     };
-    setInterval(() => {
-        ResponseSys_1.fBroadcast({
-            sRoute: '',
-            ok: true,
-            data: clientToken,
-            errors: [],
-        });
-    }, 3000);
     console.log(`[${fGetNowDataStr()}] Client connect ${clientToken}`);
+    // say all new player enter
+    PlayerSyncCtrl_1.faPlayerEnterWorld(clientToken);
     /* receiving data from a client */
     socket.on('data', async (data) => {
-        const errorSys = new AAClasses.Components.ErrorSys();
         console.log(`[${fGetNowDataStr()}] Data from [${clientToken}]: `, data.toString());
         // router
-        const request = ResponseSys_1.fRequest(data, clientToken);
-        /* connect login controller */
-        if (request.sRoute == UserR_1.UserLogin.sRequestRoute) {
-            await UserCtrl_1.faUserLogin(socket, request, errorSys, db_1.db);
-        }
-        else {
-            /* if the route did not match, sends empty line */
-            ResponseSys_1.fResponse(socket, {
-                sRoute: '',
-                ok: true,
-                data: {},
-                errors: [],
-            });
-        }
+        await Route_1.faRouter(ResponseSys_1.fRequest(data, clientToken), socket, clientToken);
     });
     /* client disconnect */
     socket.on('end', () => {
         delete db_1.aSocketClient[clientToken];
         console.log(`[${fGetNowDataStr()}] Client ${clientToken} disconnect`);
+        // say all player exit
+        PlayerSyncCtrl_1.faPlayerExitWorld(clientToken);
     });
     /* socket error */
     socket.on('error', (err) => {

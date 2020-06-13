@@ -46,13 +46,15 @@ exports.fResponse = (socket, response) => {
  * @param socket
  * @param response
  */
-exports.fBroadcast = (response) => {
+exports.fBroadcast = (response, sToken) => {
     // The fastest cycle-busting object elements
     const aClientKey = Object.keys(db_1.aSocketClient);
     for (let i = 0; i < aClientKey.length; i++) {
         // the socket may not exist, try..catch help us
         try {
-            db_1.aSocketClient[aClientKey[i]].socket.write(JSON.stringify(response));
+            if (sToken != aClientKey[i]) {
+                db_1.aSocketClient[aClientKey[i]].socket.write(JSON.stringify(response));
+            }
         }
         catch (_a) { }
     }

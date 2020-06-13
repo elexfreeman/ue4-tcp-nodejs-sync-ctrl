@@ -36,4 +36,4 @@ export declare const fResponse: (socket: net.Socket, response: BaseResponseI) =>
  * @param socket
  * @param response
  */
-export declare const fBroadcast: (response: BaseResponseI) => void;
+export declare const fBroadcast: (response: BaseResponseI, sToken: string) => void;

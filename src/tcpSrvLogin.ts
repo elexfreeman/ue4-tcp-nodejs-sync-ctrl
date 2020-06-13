@@ -7,6 +7,8 @@ import * as AAClasses from '@a-a-game-studio/aa-classes/lib';
 import { faUserLogin } from "./Module/User/UserCtrl";
 import { fBaseRequest, fRequest, fResponse, fBroadcast } from "./Module/Sys/ResponseSys";
 import { UserLogin } from "./Module/User/UserR";
+import { faPlayerEnterWorld, faPlayerExitWorld } from "./Module/PlayerSync/PlayerSyncCtrl";
+import { faRouter } from "./Module/Route/Route";
 
 /**
  * The current date
@@ -26,44 +28,21 @@ const server = net.createServer((socket: net.Socket) => {
     aSocketClient[clientToken] = {
         user: null,
         socket: socket,
+        loc: null,
     };
-
-    
-    setInterval(()=>{
-        fBroadcast({
-            sRoute: '',
-            ok: true,
-            data: clientToken,
-            errors: [],
-        })
-
-    }, 3000);
 
     console.log(`[${fGetNowDataStr()}] Client connect ${clientToken}`);
 
+    // say all new player enter
+    faPlayerEnterWorld(clientToken);
 
     /* receiving data from a client */
     socket.on('data', async (data: Buffer) => {
-        const errorSys = new AAClasses.Components.ErrorSys();
 
         console.log(`[${fGetNowDataStr()}] Data from [${clientToken}]: `, data.toString());
 
         // router
-
-        const request: fBaseRequest = fRequest(data, clientToken);
-
-        /* connect login controller */
-        if (request.sRoute == UserLogin.sRequestRoute) {
-            await faUserLogin(socket, request, errorSys, db);
-        } else {
-            /* if the route did not match, sends empty line */
-            fResponse(socket, {
-                sRoute: '',
-                ok:true,
-                data: {},
-                errors: [],
-            });
-        }
+        await faRouter(fRequest(data, clientToken), socket, clientToken);       
 
     });
 
@@ -71,6 +50,8 @@ const server = net.createServer((socket: net.Socket) => {
     socket.on('end', () => {
         delete aSocketClient[clientToken];
         console.log(`[${fGetNowDataStr()}] Client ${clientToken} disconnect`);
+        // say all player exit
+        faPlayerExitWorld(clientToken);
     });
 
     /* socket error */

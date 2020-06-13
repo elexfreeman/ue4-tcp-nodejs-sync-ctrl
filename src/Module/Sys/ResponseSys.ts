@@ -74,14 +74,16 @@ export const fResponse = (socket: net.Socket, response: BaseResponseI) => {
  * @param socket 
  * @param response 
  */
-export const fBroadcast = (response: BaseResponseI) => {
+export const fBroadcast = (response: BaseResponseI, sToken: string) => {
 
     // The fastest cycle-busting object elements
     const aClientKey = Object.keys(aSocketClient);
     for (let i = 0; i < aClientKey.length; i++) {
         // the socket may not exist, try..catch help us
         try {
-            aSocketClient[aClientKey[i]].socket.write(JSON.stringify(response));
-        } catch {}
+            if (sToken != aClientKey[i]) {
+                aSocketClient[aClientKey[i]].socket.write(JSON.stringify(response));
+            }
+        } catch { }
     }
 }
