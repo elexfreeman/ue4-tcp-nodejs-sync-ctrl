@@ -20,7 +20,6 @@ const fGetNowDataStr = (): string => moment().format('DD.MM.YYYY HH:mm:ss');
  */
 const server = net.createServer((socket: net.Socket) => {
 
-
     /* we generate a token to the client */
     const clientToken = fGenerateToken();
 
@@ -38,9 +37,7 @@ const server = net.createServer((socket: net.Socket) => {
 
     /* receiving data from a client */
     socket.on('data', async (data: Buffer) => {
-
-        console.log(`[${fGetNowDataStr()}] Data from [${clientToken}]: `, data.toString());
-
+        //console.log(`[${fGetNowDataStr()}] Data from [${clientToken}]: `, data.toString());
         // router
         await faRouter(fRequest(data, clientToken), socket, clientToken);       
 

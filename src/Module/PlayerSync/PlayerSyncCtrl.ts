@@ -1,4 +1,4 @@
-import { Components  } from '@a-a-game-studio/aa-classes/lib';
+import { Components } from '@a-a-game-studio/aa-classes/lib';
 import * as net from "net";
 import { fBaseRequest, fResponse, fBroadcast } from '../Sys/ResponseSys';
 
@@ -20,7 +20,7 @@ export const faPlayerEnterWorld = async (sToken: string) => {
       },
       errors: null,
    }, sToken)
-   
+
 }
 
 /**
@@ -38,17 +38,14 @@ export const faPlayerExitWorld = async (sToken: string) => {
       },
       errors: null,
    }, sToken);
-   
+
 }
-
-
-
 
 
 
 /**
  * Sync players controllers
  */
-export const faPlayerSyncCtrl = async (socket: net.Socket, request: fBaseRequest, errorSys: Components.ErrorSys, db: any) => {
-   console.log('faUserLogin msg', request.data);
+export const faPlayerMoveToLocCtrl = async (socket: net.Socket, request: fBaseRequest, errorSys: Components.ErrorSys, db: any) => {
+   console.log('faPlayerMoveToLocCtrl msg', request);
 }

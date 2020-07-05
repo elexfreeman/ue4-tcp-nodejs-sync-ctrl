@@ -81,12 +81,14 @@ export namespace MoveToLoc {
  * Broadcast all, player move to location
  * server ==> players
  */
-export namespace PlayerMoveToLoc {
+export namespace srvPlayerMoveToLoc {
 
-   export const sRequestRoute = 'move_to_loc_req';
-   export const sResponseRoute = 'move_to_resp';
+   export const sRoute = 'srv_move_to_loc';
 
-   export interface RequestI { }
+   export interface input {
+      loc: VectorI;
+      sToken: string;
+   }
 
    export interface ResponseI extends BaseResponseI {
       data: {
@@ -94,6 +96,22 @@ export namespace PlayerMoveToLoc {
          sToken: string;
       }
    }
+}
+
+
+/**
+ * client send player move to location
+ * client ==> server
+ */
+export namespace clientPlayerMoveToLoc {
+
+   export const sRoute = 'client_move_to_loc';
+
+   export interface input {
+      loc: VectorI;
+      sToken: string;
+   }
+
 }
 
 
